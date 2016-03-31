@@ -15,8 +15,8 @@ fi
 case $1 in
     start)
 	for node in $(seq 1 $2);do
-	    client=${nodes[$RANDOM % ${#nodes[@]} ]}
-	    echo "Starting client in $client"
+	    client=${nodes[$node % ${#nodes[@]} ]}
+	    #echo "Starting client in $client"
 	    ssh $client "$SCRIPTS_DIR/start-client.sh $CLIENT_NAME"  &
 	done
 	;;
