@@ -1,5 +1,5 @@
 source zk-config.sh
-
+echo $CONFFILE
 i=0
 ZK=$HOME/zookeeper/server/zookeeper
 case $3 in

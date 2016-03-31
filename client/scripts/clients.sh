@@ -1,5 +1,5 @@
 #!/bin/bash
-source ./env.sh
+source "$HOME/zookeeper/client/scripts/env.sh"
 nodes=("node09" "node15" "node14" "node10" "node11" "node12" "node13")
 
 ARGS_NUM=1
@@ -17,13 +17,13 @@ case $1 in
 	for node in $(seq 1 $2);do
 	    client=${nodes[$RANDOM % ${#nodes[@]} ]}
 	    echo "Starting client in $client"
-	    ssh $client "bash $SCRIPT_DIR/start-client.sh $CLIENT_NAME"  &
+	    ssh $client "$SCRIPTS_DIR/start-client.sh $CLIENT_NAME"  &
 	done
 	;;
     stop)
 	echo "Stopping clients in active nodes"
 	for node in ${nodes[@]};do
-	    ssh $node  "bash $SCRIPT_DIR/stop-client.sh $CLIENT_NAME" 
+	    ssh $node  "$SCRIPTS_DIR/stop-client.sh $CLIENT_NAME" 
 	done
 	killall ssh &> /dev/null
 	;;

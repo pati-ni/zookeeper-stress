@@ -47,4 +47,3 @@ done
 
 
 
-#Write configuration
