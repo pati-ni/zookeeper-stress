@@ -1,0 +1,15 @@
+#!/bin/bash
+
+
+ZOOKEEPER_HOME=$HOME/.local/zookeeper-3.4.8
+CURRENT_DIR=$PWD
+
+
+zookeeper_controller(){
+	cd $ZOOKEEPER_HOME
+	bin/zkServer.sh "$@"
+	cd $PWD
+	exit 0
+}
+
+zookeeper_controller $@
