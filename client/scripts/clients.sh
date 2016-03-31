@@ -3,7 +3,7 @@ source ./env.sh
 nodes=("node09" "node15" "node14" "node10" "node11" "node12" "node13")
 
 ARGS_NUM=1
-CLIENT_NAME="kz-client.py"
+CLIENT_NAME="kz-leaderElection.py"
 
 if [[ $# -lt $ARGS_NUM ]]
 then

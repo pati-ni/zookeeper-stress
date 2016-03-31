@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ARGS_NUM=2
 if [ $# -lt $ARGS_NUM ]
