@@ -14,9 +14,9 @@ declare -A options
 options["tickTime"]=2000
 options["clientPort"]=9666
 options["dataDir"]=/var/tmp/cs091747/zk/data
-options["initLimit"]=10
-options["syncLimit"]=4
-options["globalOutstandingLimit"]=50000
+options["initLimit"]=5
+options["syncLimit"]=2
+#options["globalOutstandingLimit"]=50000
 options["forceSync"]=no
 
 QUORUMPORT1=12888

@@ -1,7 +1,8 @@
-source zk-config.sh
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source $SCRIPT_DIR/zk-config.sh
 echo $CONFFILE
 i=0
-ZK=$HOME/zookeeper/server/zookeeper
+ZK=$SCRIPT_DIR/zookeeper
 case $3 in
 start)
         for node in ${nodes[@]}

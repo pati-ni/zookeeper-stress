@@ -28,6 +28,6 @@ case $1 in
 	killall ssh &> /dev/null
 	;;
     *)
-       echo "shit"
+       echo "Unknown command $1"
 
 esac
