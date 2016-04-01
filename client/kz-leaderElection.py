@@ -9,7 +9,7 @@ import time
 import random
 import timeit
 import threading
-import stopwatch
+
 #logging.basicConfig(level=logging.INFO)
 
 
@@ -44,13 +44,13 @@ class ClientElection:
 
     def leaderElection(self):
         self.election = Election(self.zk,self.znode,identifier=self.hostname)
-        self.election.run(self.leaderEnd,self.hostname)
+        self.election.run(self.electionWon,self.hostname)
 
-    def leaderEnd(self,hostname):
+    def electionWon(self,hostname):
         
         #print 'Success',hostname,'Synthetic workload running...'
         self.counter+=1
-        #self.zk.set(self.znode,str(self.counter))
+        self.zk.set(self.znode,str(self.counter))
         #time.sleep(random.gammavariate(0.7,0.2))
         #print 'Exiting...'
 
@@ -68,11 +68,4 @@ if __name__ == '__main__':
     client = ClientElection('/erection')
     
     while True:
-	print 'Here'
-        t = stopwatch.Timer()
         l = timeit.Timer(lambda: client.leaderElection()).repeat(number=4)
-        t.stop()
-        total = 0
-        for timer in l:
-            total+=timer
-        print(t.elapsed-total)
