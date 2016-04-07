@@ -19,7 +19,9 @@ case $3 in
             ssh $node "bash -c \"\
                 rm -rf ${options[dataDir]} ;\
                 rm -rf ${options[dataLogDir]};\
+                rm -rf /var/tmp/cs091747/zookeeper;\
                 mkdir -p ${options[dataDir]} ;\
+                mkdir -p /var/tmp/cs091747/zookeeper;\
                 mkdir -p ${options[dataLogDir]} ;\
                 echo ${ids[i]} >${options[dataDir]}/myid;\
                 $ZK start $CONFFILE\""

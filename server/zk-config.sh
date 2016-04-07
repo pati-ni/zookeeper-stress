@@ -29,6 +29,7 @@ while read -r line;do
 	nodes+=("$word")
     done
 done < $1
+
 function write_config {
     echo "Creating configuration for zookeeper in $CONFFILE"
     echo "Nodes Active: ${nodes[@]}"

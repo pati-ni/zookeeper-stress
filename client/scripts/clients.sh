@@ -12,12 +12,32 @@ then
     exit 1
 fi
 
+function client_start {
+    if [[ $1 -eq "0" ]]
+    then
+	return
+    fi
+    local i=0
+    for node in $(seq 1 $1);do
+	((i++))
+	#echo "Starting client in $client"
+	#echo "$SCRIPTS_DIR/start-client.sh $CLIENT_NAME"
+	ssh $2 "bash -c \"screen -dmS zk-client-$i $SCRIPTS_DIR/start-client.sh $CLIENT_NAME\" "
+    done
+    #echo "ended batch of $1 clients on $2"
+}
+
+
 case $1 in
     start)
-	for node in $(seq 1 $2);do
-	    client=${nodes[$node % ${#nodes[@]} ]}
-	    #echo "Starting client in $client"
-	    ssh $client "$SCRIPTS_DIR/start-client.sh $CLIENT_NAME"  &
+	clients=$(( $2 / ${#nodes[@]}  ))
+	for node in  ${nodes[@]};do
+	    ( client_start $clients $node ) &
+	done
+	for i in $(seq 1 $(( $2 % ${#nodes[@]} )))
+	do
+	    node=${nodes[$i % ${#nodes[@]} ]}
+	    ( client_start 1 $node ) &
 	done
 	;;
     stop)
@@ -28,6 +48,6 @@ case $1 in
 	killall ssh &> /dev/null
 	;;
     *)
-       echo "Unknown command $1"
+	echo "Unknown command $1"
 
 esac
