@@ -11,12 +11,15 @@ CONFFILE=$2
 
 declare -A options
 
+CLIENTPORT=9666
 options["tickTime"]=2000
-options["clientPort"]=9666
+#options["clientPort"]=9666
+options["standaloneEnabled"]=true
 options["dataDir"]=/media/localhd/cs091747/zk/data
 options["dataLogDir"]=/var/tmp/cs091747/zk
 options["initLimit"]=5
 options["syncLimit"]=2
+options["dynamicConfigFile"]="$CONFFILE.dynamic"
 #options["globalOutstandingLimit"]=50000
 options["forceSync"]=no
 
@@ -41,14 +44,14 @@ function write_config {
 	echo "${key}=${options[${key}]}">>$CONFFILE
     done
 
-
     local i=0
     ids=()
+    rm ${options["dynamicConfigFile"]}
     for node in ${nodes[@]}
     do
 	((i++))
 	ids+=($i)
-	echo "server.$i=$node:$QUORUMPORT1:$QUORUMPORT2" >> $CONFFILE
+	echo "server.$i=$node:$QUORUMPORT1:$QUORUMPORT2;$CLIENTPORT" >> ${options["dynamicConfigFile"]}
     done
-
+    echo "Config file create on $CONFFILE"
 }

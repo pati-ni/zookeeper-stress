@@ -24,7 +24,7 @@ function client_start {
 	#echo "$SCRIPTS_DIR/start-client.sh $CLIENT_NAME"
 	ssh $2 "bash -c \"screen -dmS zk-client-$i $SCRIPTS_DIR/start-client.sh $CLIENT_NAME\" "
     done
-    #echo "ended batch of $1 clients on $2"
+    echo "ended batch of $1 clients on $2"
 }
 
 
