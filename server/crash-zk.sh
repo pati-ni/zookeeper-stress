@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-echo "Killing zookeeper instance on $(hostname)"
+echo "$(hostname): Killing zookeeper instance"
 ps aux | grep zookeeper | grep java | grep -v grep | awk '{print $2}'| xargs kill -9
 sleep_time="$((( ( $RANDOM % $1 ) )+1))"
 echo "Sleeping for $sleep_time seconds"

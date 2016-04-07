@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#Script that manages the experiments
+
 if [ $# -lt 1 ];then
     echo "Usage: $0 <command> <optional-args>"
     exit 1
@@ -39,6 +41,5 @@ case $1 in
 	;;
     *)
 	echo "Unknown command $1" 
-
 
 esac
