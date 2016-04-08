@@ -50,6 +50,7 @@ class ClientElection:
         
         #print 'Success',hostname,'Synthetic workload running...'
         self.counter+=1
+        self.zk.set(self.znode,str(self.counter))
         #time.sleep(random.gammavariate(0.7,0.2))
         #print 'Exiting...'
 

@@ -20,6 +20,7 @@ options["dataLogDir"]=/var/tmp/cs091747/zk
 options["initLimit"]=5
 options["syncLimit"]=2
 options["dynamicConfigFile"]="$CONFFILE.dynamic"
+options["maxClientCnxns"]=0
 #options["globalOutstandingLimit"]=50000
 options["forceSync"]=no
 

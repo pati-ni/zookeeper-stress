@@ -3,7 +3,7 @@ source "$HOME/zookeeper/client/scripts/env.sh"
 nodes=("node09" "node15" "node14" "node10" "node11" "node12" "node13")
 
 ARGS_NUM=1
-CLIENT_NAME="kz-leaderElection.py"
+#CLIENT_NAME="kz-leaderElection.py"
 
 if [[ $# -lt $ARGS_NUM ]]
 then
@@ -22,9 +22,9 @@ function client_start {
 	((i++))
 	#echo "Starting client in $client"
 	#echo "$SCRIPTS_DIR/start-client.sh $CLIENT_NAME"
-	ssh $2 "bash -c \"screen -dmS zk-client-$i $SCRIPTS_DIR/start-client.sh $CLIENT_NAME\" "
+	ssh $2 "bash -c \"screen -dmS $3-$i $SCRIPTS_DIR/start-client.sh $3 \" "
     done
-    echo "ended batch of $1 clients on $2"
+    echo "$2: Batch of $1, client: $3"
 }
 
 
@@ -32,18 +32,18 @@ case $1 in
     start)
 	clients=$(( $2 / ${#nodes[@]}  ))
 	for node in  ${nodes[@]};do
-	    ( client_start $clients $node ) &
+	    ( client_start $clients $node $3 ) &
 	done
 	for i in $(seq 1 $(( $2 % ${#nodes[@]} )))
 	do
 	    node=${nodes[$i % ${#nodes[@]} ]}
-	    ( client_start 1 $node ) &
+	    ( client_start 1 $node $3 ) &
 	done
 	;;
     stop)
 	echo "Stopping clients in active nodes"
 	for node in ${nodes[@]};do
-	    ssh $node  "$SCRIPTS_DIR/stop-client.sh $CLIENT_NAME" 
+	    ssh $node  "$SCRIPTS_DIR/stop-client.sh $2"
 	done
 	killall ssh &> /dev/null
 	;;
