@@ -14,7 +14,7 @@ declare -A options
 CLIENTPORT=9666
 options["tickTime"]=2000
 #options["clientPort"]=9666
-options["standaloneEnabled"]=true
+options["standaloneEnabled"]=false
 options["dataDir"]=/media/localhd/cs091747/zk/data
 options["dataLogDir"]=/var/tmp/cs091747/zk
 options["initLimit"]=5

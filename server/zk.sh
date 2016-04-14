@@ -24,7 +24,8 @@ case $3 in
                 mkdir -p /var/tmp/cs091747/zookeeper;\
                 mkdir -p ${options[dataLogDir]} ;\
                 echo ${ids[i]} >${options[dataDir]}/myid;\
-                $ZK start $CONFFILE\""
+		cp ${CONFFILE}* /var/tmp/cs091747/zookeeper
+                $ZK start /var/tmp/cs091747/zookeeper/zoo.cfg\""
 	    ((i++))
         done
         ;;
