@@ -1,6 +1,6 @@
 #!/bin/bash
 source "$HOME/zookeeper/client/scripts/env.sh"
-nodes=("node09" "node15" "node14" "node10" "node11" "node12" "node13")
+nodes=("node10" "node11")
 
 ARGS_NUM=1
 #CLIENT_NAME="kz-leaderElection.py"
