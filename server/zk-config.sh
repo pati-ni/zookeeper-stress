@@ -7,8 +7,10 @@ then
     exit
 fi
 
-CONFFILE=$2
 
+SOURCEFILE=$2
+CONFFILE=/var/tmp/cs091747/zookeeper/zoo.cfg
+echo DYNAMICFILE
 declare -A options
 
 CLIENTPORT=9666
@@ -26,7 +28,7 @@ options["forceSync"]=no
 
 QUORUMPORT1=12888
 QUORUMPORT2=13888
-
+DYNAMICFILE="$(dirname ${SOURCEFILE})/$(basename ${options["dynamicConfigFile"]})"
 nodes=()
 while read -r line;do
     for word in $line; do
@@ -38,21 +40,21 @@ function write_config {
     echo "Creating configuration for zookeeper in $CONFFILE"
     echo "Nodes Active: ${nodes[@]}"
     
-    rm $CONFFILE &> /dev/null
+    rm $SOURCEFILE &> /dev/null
 
 
     for key in ${!options[@]};do
-	echo "${key}=${options[${key}]}">>$CONFFILE
+	echo "${key}=${options[${key}]}">>$SOURCEFILE
     done
 
     local i=0
     ids=()
-    rm ${options["dynamicConfigFile"]}
+    rm $DYNAMICFILE &> /dev/null
     for node in ${nodes[@]}
     do
 	((i++))
 	ids+=($i)
-	echo "server.$i=$node:$QUORUMPORT1:$QUORUMPORT2;$CLIENTPORT" >> ${options["dynamicConfigFile"]}
+	echo "server.$i=$node:$QUORUMPORT1:$QUORUMPORT2;$CLIENTPORT" >> $DYNAMICFILE
     done
     echo "Config file create on $CONFFILE"
 }
