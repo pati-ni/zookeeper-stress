@@ -19,10 +19,10 @@ function client_start {
     fi
     local i=0
     for node in $(seq 1 $1);do
-	((i++))
-	#echo "Starting client in $client"
-	#echo "$SCRIPTS_DIR/start-client.sh $CLIENT_NAME"
-	ssh $2 "bash -c \"screen -dmS $3-$i $SCRIPTS_DIR/start-client.sh $3 \" "
+        ((i++))
+        #echo "Starting client in $client"
+        #echo "$SCRIPTS_DIR/start-client.sh $CLIENT_NAME"
+        ssh $2 "bash -c \"screen -dmS $3-$i $SCRIPTS_DIR/start-client.sh $3 \" "
     done
     echo "$2: Batch of $1, client: $3"
 }
