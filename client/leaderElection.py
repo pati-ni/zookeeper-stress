@@ -30,7 +30,7 @@ def benchmark(func):
 
 if __name__ == '__main__':
 
-    st = ClientElection('/erection')
+    st = ClientElection('/erection3')
     reactor.callInThread(benchmark,st.leader_election)
     reactor.run()
 

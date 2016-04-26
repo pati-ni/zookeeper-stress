@@ -58,10 +58,7 @@ class ClientBase:
         self.log_queue = []
         self.log = task.LoopingCall(self.logger)
         self.log.start(5)
-        #@self.zk.DataWatch('/logger')
-        #def erection_handler(data,stat,event):
-            #logging.info('Data:',data,'Version:', stat.version,'Event:', event)
-            #print 'Contenders:', self.election.contenders()
+
 
     def logger(self):
 
