@@ -3,9 +3,10 @@ import logging
 import timeit
 import time
 from threading import Lock
-from twisted.internet import reactor
 from twisted.internet import task
 from kazoo.client import KazooClient
+import copy
+
 
 
 def read_nodes(file='/home/students/cs091747/zookeeper/server/nodes_list',port=9666):
@@ -16,6 +17,15 @@ def read_nodes(file='/home/students/cs091747/zookeeper/server/nodes_list',port=9
                 nodes.append(word+':'+str(port))
     return ','.join(nodes)
 
+def insert_client_nodes(client_file):
+    nodes=[]
+
+    with open(client_file) as fp:
+        for line in fp:
+            for word in line.rstrip('\n').split(' '):
+                nodes.append(word)
+    return nodes
+
 
 def timer(method):
 
@@ -24,7 +34,7 @@ def timer(method):
         l = timeit.Timer(lambda : method(self, *args, **kwargs)).timeit(number=1)
         #Append to queue
         with self.lock:
-            self.log_queue.append((stamp, self.id, l))
+            self.log_queue.append((stamp,l,self.id))
 
     return timed
 
@@ -42,14 +52,14 @@ class ClientBase:
     finished = False
     counter = {'success':0}
 
-    def __init__(self, z_node, logger_node='/logger'):
+    def __init__(self, z_node, id, logger_node='/logger'):
 
         logging.basicConfig()
         self.hosts = read_nodes()
         self.logger_z_node = logger_node
         self.hostname = socket.gethostname()
         self.z_node = z_node
-        self.id = self.hostname
+        self.id = id
         self.zk = KazooClient(self.hosts)
         self.zk.start()
         self.lock = Lock()
@@ -64,11 +74,15 @@ class ClientBase:
 
         zk_log = KazooClient(self.hosts)
         zk_log.start()
+        log_packet = {}
         with self.lock:
             if self.log_queue:
-                print 'Logger inserted',len(self.log_queue)
-                zk_log.set(self.logger_z_node, str(self.log_queue))
+                log_packet['request_data'] = copy.deepcopy(self.log_queue)
             del self.log_queue[:]
+        log_packet['host_name'] = self.hostname
+        log_packet['node'] = self.z_node
+        log_packet['type'] = 'client_log'
+        zk_log.set(self.logger_z_node, str(log_packet))
         zk_log.stop()
 
 

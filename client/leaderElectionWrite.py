@@ -1,12 +1,12 @@
-from twisted.internet import reactor
 from kazoo.recipe.election import Election
 from client import ClientBase
 import client
+from runner import clientRunner
 
 class ClientElection(ClientBase):
 
-    def __init__(self, z_node):
-            ClientBase.__init__(self,z_node)
+    def __init__(self, z_node, id):
+            ClientBase.__init__(self,z_node, id)
 
     @client.timer
     def leader_election(self):
@@ -21,14 +21,6 @@ class ClientElection(ClientBase):
         self.zk.set(self.z_node,str(self.counter['success']))
         #print 'Exiting...'
 
-def benchmark(func):
-    i=0
-    func()
-    reactor.callInThread(benchmark, func)
-
 
 if __name__ == '__main__':
-    st = ClientElection('/erection3')
-    reactor.callInThread(benchmark,st.leader_election)
-    reactor.run()
-    
+    clientRunner(ClientElection,ClientElection.leader_election)
