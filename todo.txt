@@ -1,5 +1,5 @@
-start leader election with different target znode to stress the system
-
-monitoring logger
+plot logger
 
 performance assesement
+
+crash random nodes
