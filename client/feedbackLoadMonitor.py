@@ -49,6 +49,7 @@ class FeedbackMonitor(Monitor):
 
 
     def _data_handler(self,response):
+
         if response['node'] == self.monitoring_node:
             if self._improve_throughput(response):
                 print 'Mean Latency',self.df['response_time'].mean()

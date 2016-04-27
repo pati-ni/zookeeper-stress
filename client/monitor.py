@@ -21,6 +21,7 @@ class Monitor:
 
         @self.zk.DataWatch(self.z_node)
         def erection_handler(data,stat,event):
+
             if not data:
                 return
             try:
@@ -30,10 +31,12 @@ class Monitor:
                 pass
 
     def start(self):
+
         self.log = task.LoopingCall(self.throughput)
         self.log.start(self.timeout)
 
     def _data_handler(self,response):
+
         with self.lock:
             self.requests += len(response['request_data'])
 

@@ -34,8 +34,8 @@ def timer(method):
         l = timeit.Timer(lambda : method(self, *args, **kwargs)).timeit(number=1)
         #Append to queue
         with self.lock:
-            self.log_queue.append((stamp,l,self.id))
-
+            record = (stamp,l,self.id)
+            self.log_queue.append(record)
     return timed
 
 
@@ -74,16 +74,17 @@ class ClientBase:
 
         zk_log = KazooClient(self.hosts)
         zk_log.start()
-        log_packet = {}
         with self.lock:
             if self.log_queue:
-                log_packet['request_data'] = copy.deepcopy(self.log_queue)
-            del self.log_queue[:]
-        log_packet['host_name'] = self.hostname
-        log_packet['node'] = self.z_node
-        log_packet['type'] = 'client_log'
-        zk_log.set(self.logger_z_node, str(log_packet))
+                log_packet = {'host_name':self.hostname,'node':self.z_node,'type':'client_log','request_data':self.log_queue}
+                message = str(log_packet)
+                zk_log.set(self.logger_z_node, message)
+                log_packet.clear()
+                del self.log_queue[:]
+                del message
+
         zk_log.stop()
+        del zk_log
 
 
     def _log_dump(self,record):
