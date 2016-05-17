@@ -9,7 +9,7 @@ fi
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 NODESLIST="$SCRIPT_DIR/server/nodes_list"
 
-function stop_clients{
+function stop_clients {
     for client in $(ls $SCRIPT_DIR/client/modules/*.py);
     do
         echo "killing client $client"
