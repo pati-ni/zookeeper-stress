@@ -10,15 +10,13 @@ from twisted.internet import reactor
 #Monitoring class with load assertion
 #Optimizing system throughput
 
-def get_throughput(df):
+def get_throughput(df,clients=1):
 
     if df.empty:
         return 0
-
     t0 = df['timestamp'].min()
     t1 = df['timestamp'].max()
-
-    return len(df)/(t1-t0)
+    return len(df)/((t1-t0)*clients)
 
 class FeedbackMonitor(Monitor):
     clients_spawned = 0
@@ -43,13 +41,13 @@ class FeedbackMonitor(Monitor):
         new_throughput = get_throughput(new_df)
         with self.lock:
             self.df = pd.concat([self.df,new_df])
-            throughput = get_throughput(self.df)
+            node_df = self.df.loc[ self.df.id == new_df.iloc[0]['id'] ]
+            throughput = get_throughput(node_df,clients=self.clients_spawned)
         return new_throughput > throughput
 
 
 
     def _data_handler(self,response):
-
         if response['node'] == self.monitoring_node:
             if self._improve_throughput(response):
                 print 'Mean Latency',self.df['response_time'].mean()

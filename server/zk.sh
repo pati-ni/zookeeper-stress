@@ -35,7 +35,11 @@ case $3 in
             ((i++))
             echo "$node"
             ssh $node "bash -c \"\
-                        $ZK $3 $CONFFILE;\""
+		$ZK $3 $CONFFILE;
+                rm -rf ${options[dataDir]} ;\
+                rm -rf ${options[dataLogDir]};\
+                rm -rf /var/tmp/cs091747/*;
+                rm -rf /media/localhd/cs091747/*;\""
         done
         ;;
     kill)
