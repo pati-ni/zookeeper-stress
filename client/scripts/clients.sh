@@ -1,6 +1,12 @@
 #!/bin/bash
 source "$HOME/zookeeper/client/scripts/env.sh"
-nodes=("node10" "node11" "node12" "node13" "node14" "node15")
+
+nodes=()
+while read -r line;do
+    for word in $line; do
+	nodes+=("$word")
+    done
+done < client/node_list
 
 ARGS_NUM=1
 #CLIENT_NAME="kz-leaderElection.py"
