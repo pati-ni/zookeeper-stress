@@ -1,20 +1,20 @@
 from kazoo.recipe.election import Election
-from client.client import ClientBase
-import client.client
-from client.runner import clientRunner
+from client import ClientBase
+import client
+from runner import clientRunner
 
 class ClientElection(ClientBase):
 
     def __init__(self, z_node, id):
             ClientBase.__init__(self,z_node, id)
 
-    @client.client.timer
+    @client.timer
     def leader_election(self):
         #time.sleep(random.gammavariate(0.7,0.2))
         self.election = Election(self.zk,self.z_node,identifier=self.hostname)
         self.election.run(self.election_won,self.hostname)
 
-    @client.client.complete_task
+    @client.complete_task
     def election_won(self,hostname):
         #print 'Success',hostname,'Synthetic workload running...'
         self.counter['success']+=1

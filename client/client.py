@@ -27,15 +27,22 @@ def insert_client_nodes(client_file):
     return nodes
 
 
+
+
 def timer(method):
 
     def timed(self, *args, **kwargs):
         stamp = time.time()
         l = timeit.Timer(lambda : method(self, *args, **kwargs)).timeit(number=1)
         #Append to queue
+        if self.reconnect:
+            self.zk = KazooClient(self.hosts)
+            self.zk.start()
         with self.lock:
             record = (stamp,l,self.id)
             self.log_queue.append(record)
+        if self.reconnect:
+            self.zk.stop()
     return timed
 
 
@@ -52,16 +59,18 @@ class ClientBase:
     finished = False
     counter = {'success':0}
 
-    def __init__(self, z_node, id, logger_node='/logger'):
+    def __init__(self, z_node, id, logger_node='/logger',reconnect=False):
 
         logging.basicConfig()
         self.hosts = read_nodes()
         self.logger_z_node = logger_node
         self.hostname = socket.gethostname()
+        self.reconnect = reconnect
         self.z_node = z_node
         self.id = id
-        self.zk = KazooClient(self.hosts)
-        self.zk.start()
+        if not self.reconnect:
+            self.zk = KazooClient(self.hosts)
+            self.zk.start()
         self.lock = Lock()
         self.zk.ensure_path(self.z_node)
         self.zk.ensure_path(self.logger_z_node)
@@ -93,6 +102,7 @@ class ClientBase:
 
     def __del__(self):
         self.log.stop()
-        self.zk.stop()
+        if not self.reconnect:
+            self.zk.stop()
         print self.counter['success']
 
