@@ -33,6 +33,7 @@ def timer(method):
 
     def timed(self, *args, **kwargs):
         stamp = time.time()
+        print stamp
         l = timeit.Timer(lambda : method(self, *args, **kwargs)).timeit(number=1)
         #Append to queue
         if self.reconnect:
@@ -85,7 +86,7 @@ class ClientBase:
         zk_log.start()
         with self.lock:
             if self.log_queue:
-                log_packet = {'host_name':self.hostname,'node':self.z_node,'type':'client_log','request_data':self.log_queue}
+                log_packet = {'hostname':self.hostname,'node':self.z_node,'type':'client_log','request_data':self.log_queue}
                 message = str(log_packet)
                 zk_log.set(self.logger_z_node, message)
                 log_packet.clear()
