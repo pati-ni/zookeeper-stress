@@ -7,18 +7,16 @@ import random
 import subprocess
 import client
 import sys
+from flask import Flask
+from threading import Lock
 from twisted.internet import reactor
-from flask import Flask, make_response, render_template
-#Monitoring class with load assertion
-#Optimizing system throughput
 
-def get_throughput(df):
+def nodes_throughput(df):
 
     if df.empty:
         return 0
-    t0 = df['timestamp'].min()
-    t1 = df['timestamp'].max()
-    return len(df)/(t1-t0)
+    groups = df.groupby('id')['timestamp'].aggregate(lambda x : x.count()/float(x.max()-x.min()))
+    return groups.mean()
 
 class FeedbackMonitor(Monitor):
     clients_spawned = 0
@@ -28,10 +26,12 @@ class FeedbackMonitor(Monitor):
         self.nodes = client.insert_client_nodes(client_nodes)
         self.monitoring_node = node
         self.seed = random.choice(range(len(self.nodes)))
-        Monitor.__init__(self, timeout=2)
+        self.client_lock = Lock()
+        #Monitor.__init__(self, z_node='/logger'+self.monitoring_node,timeout=6)
         self.start(probability_read_bias=0)
         self.start(probability_read_bias=1)
-
+        for _ in range(2):
+            self.start()
 
 
     def _improve_throughput(self,data):
@@ -43,22 +43,23 @@ class FeedbackMonitor(Monitor):
         new_df['hostname'] = pd.Series([data['hostname']] * len(new_df))
         new_df['node'] = pd.Series([data['node']] * len(new_df))
         with self.lock:
-            node_df = self.df.loc[self.df.node == data['node']]
-            performance = len(node_df['hostname'].unique()) / node_df['response_time'].mean()
-            self.df = self.df.append(new_df,ignore_index=True)
-            node_df = self.df.loc[self.df.node == data['node']]
-            new_performance = len(node_df['hostname'].unique()) / node_df['response_time'].mean()
 
-        return new_performance/performance > 1.3
+            new_performance =nodes_throughput(new_df)/new_df['response_time'].mean()
+            self.df = self.df.append(new_df,ignore_index=True)
+            performance = nodes_throughput(self.df)/self.df['response_time'].mean()
+
+        print new_performance,performance
+        return new_performance/performance > 1.1
 
 
 
     def _data_handler(self,response):
-        if self._improve_throughput(response):
-            print 'Mean Latency',self.df['response_time'].mean()
-            self.start()
+        if response['node'] == self.monitoring_node:
+            if self._improve_throughput(response):
+                print 'Mean Latency',self.df['response_time'].mean()
+                self.start()
 
-    def start(self, probability_read_bias=0.8):
+    def start(self, probability_read_bias=0.9):
 
         project_dir = "/home/students/cs091747/zookeeper"
         script_dir = "client/scripts"
@@ -68,27 +69,32 @@ class FeedbackMonitor(Monitor):
         else:
             client_file = self.client['write']
 
-        with self.lock:
+        with self.client_lock:
+            self.clients_spawned += 1
             node = self.nodes[(self.seed + self.clients_spawned) % len(self.nodes)]
             script_path = "/".join([project_dir,script_dir,"start-client.sh"])
             screen_name = self.monitoring_node[1:] + client_file.split('.')[0] + str(self.clients_spawned)
             command = ["ssh", node,"screen","-dmS",screen_name,script_path,client_file,self.monitoring_node,node+screen_name]
-        new_client = subprocess.call(command)
+            new_client = subprocess.call(command)
 
         if new_client != 0:
             print 'client could not be spawned',command
         else:
             #debug message, to be commented
             print ' '.join(command),'client successfully launched',self.clients_spawned
-            self.clients_spawned += 1
+
 
 if __name__ == '__main__':
-    #app = Flask(__name__)
 
-    for i in range(int(sys.argv[1])):
-        m = FeedbackMonitor('/erection'+str(i))
-    reactor.run()
-    #app.run(host="0.0.0.0", port=20666, debug=True)
+    m = []
+
+    total_clients =  int(sys.argv[1])
+    for i in range(total_clients):
+        m.append(FeedbackMonitor('/erection' + str(i)))
+
+    app = Flask(__name__)
+
+    app.run(host="0.0.0.0", port=20666, debug=True, use_reloader=False)
 
 
 

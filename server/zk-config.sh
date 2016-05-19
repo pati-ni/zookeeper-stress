@@ -29,12 +29,22 @@ options["forceSync"]=no
 QUORUMPORT1=12888
 QUORUMPORT2=13888
 DYNAMICFILE="$(dirname ${SOURCEFILE})/$(basename ${options["dynamicConfigFile"]})"
+
+OBSERVERS=2
+
 nodes=()
 while read -r line;do
     for word in $line; do
 	nodes+=("$word")
     done
 done < $1
+
+ids=()
+for node in ${nodes[@]}
+do
+	((i++))
+	ids+=($i)
+done
 
 function write_config {
     echo "Creating configuration for zookeeper in $CONFFILE"
@@ -48,13 +58,18 @@ function write_config {
     done
 
     local i=0
-    ids=()
     rm $DYNAMICFILE &> /dev/null
     for node in ${nodes[@]}
     do
-	((i++))
-	ids+=($i)
-	echo "server.$i=$node:$QUORUMPORT1:$QUORUMPORT2;$CLIENTPORT" >> $DYNAMICFILE
+
+        if (( "$i" < "$OBSERVERS" ));
+        then
+            echo "server.${ids[i]}=$node:$QUORUMPORT1:$QUORUMPORT2:observer;$CLIENTPORT" >> $DYNAMICFILE
+        else
+            echo "server.${ids[i]}=$node:$QUORUMPORT1:$QUORUMPORT2:participant;$CLIENTPORT" >> $DYNAMICFILE
+        fi
+        ((i++))
+
     done
     echo "Config file create on $CONFFILE"
 }

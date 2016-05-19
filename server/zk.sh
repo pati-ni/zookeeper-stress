@@ -11,8 +11,8 @@ ZK=$SCRIPT_DIR/zookeeper
 
 case $3 in
     start)
-	write_config
-	i=0
+
+	    i=0
         for node in ${nodes[@]}
         do
             echo "$node id ${ids[$i]}"
@@ -23,12 +23,13 @@ case $3 in
                 mkdir -p ${options[dataDir]} ;\
                 mkdir -p /var/tmp/cs091747/zookeeper;\
                 mkdir -p ${options[dataLogDir]} ;\
-                echo ${ids[i]} >${options[dataDir]}/myid;\
-		cp ${SOURCEFILE}* /var/tmp/cs091747/zookeeper
+                echo ${ids[i]} > ${options[dataDir]}/myid;\
+		        cp ${SOURCEFILE}* /var/tmp/cs091747/zookeeper/;\
                 $ZK start $CONFFILE\""
-	    ((i++))
+	        ((i++))
         done
-        ;;
+
+    ;;
     stop)
         for node in ${nodes[@]}
         do
@@ -41,7 +42,10 @@ case $3 in
                 rm -rf /var/tmp/cs091747/*;
                 rm -rf /media/localhd/cs091747/*;\""
         done
-        ;;
+    ;;
+    reconfig)
+        write_config
+    ;;
     kill)
 	avail_nodes=("${nodes[@]}")
 	selected_nodes=()

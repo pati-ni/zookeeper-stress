@@ -33,17 +33,17 @@ def timer(method):
 
     def timed(self, *args, **kwargs):
         stamp = time.time()
-        print stamp
-        l = timeit.Timer(lambda : method(self, *args, **kwargs)).timeit(number=1)
-        #Append to queue
         if self.reconnect:
             self.zk = KazooClient(self.hosts)
             self.zk.start()
+        l = timeit.Timer(lambda : method(self, *args, **kwargs)).timeit(number=1)
+        if self.reconnect:
+            self.zk.stop()
+        #Append to queue
         with self.lock:
             record = (stamp,l,self.id)
             self.log_queue.append(record)
-        if self.reconnect:
-            self.zk.stop()
+
     return timed
 
 
@@ -69,12 +69,15 @@ class ClientBase:
         self.reconnect = reconnect
         self.z_node = z_node
         self.id = id
-        if not self.reconnect:
-            self.zk = KazooClient(self.hosts)
-            self.zk.start()
+
+        self.zk = KazooClient(self.hosts)
+        self.zk.start()
         self.lock = Lock()
         self.zk.ensure_path(self.z_node)
         self.zk.ensure_path(self.logger_z_node)
+        if self.reconnect:
+            self.zk.stop()
+
         self.log_queue = []
         self.log = task.LoopingCall(self.logger)
         self.log.start(5)

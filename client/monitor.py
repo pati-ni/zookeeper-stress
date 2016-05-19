@@ -5,7 +5,6 @@ from threading import Lock
 from twisted.internet import task
 import client
 import ast
-from abc import abstractmethod
 class Monitor:
     requests = 0
     def __init__(self, z_node='/logger',timeout=5):

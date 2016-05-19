@@ -42,6 +42,6 @@ case $1 in
         ./server/zk.sh $NODESLIST ~/zoo.cfg $1
 	;;
     *)
-	echo "Unknown command $1" 
+        ./server/zk.sh $NODESLIST ~/zoo.cfg $1
 
 esac
