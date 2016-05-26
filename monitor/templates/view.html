@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+       <link rel="stylesheet" href="http://cdn.pydata.org/bokeh/release/bokeh-0.11.0.min.css" type="text/css" />
+        <script type="text/javascript" src="http://cdn.pydata.org/bokeh/release/bokeh-0.11.0.min.js">
+        </script>
+        <script type="text/javascript">
+            Bokeh.set_log_level("info");
+        </script>
+</head>
+<body>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: {
+     equationNumbers: {  autoNumber: "AMS"  },
+     extensions: ["AMSmath.js", "AMSsymbols.js", "autobold.js"]
+  }
+});
+</script>
+<script type="text/javascript" src=
+"http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<!--This web page visualizes the function \(u(t) = Ae^{-bt}\sin (w t), \hbox{ for } t\in [0,T]\). -->
+
+</p>
+<p>
+{{ result[0]|safe }}
+{{ result[1]|safe }}
+</p>
+</body>
+</html>

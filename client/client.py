@@ -60,7 +60,7 @@ class ClientBase:
     finished = False
     counter = {'success':0}
 
-    def __init__(self, z_node, id, logger_node='/logger',reconnect=False):
+    def __init__(self, z_node, id, logger_node='/logger',reconnect=True):
 
         logging.basicConfig()
         self.hosts = read_nodes()
