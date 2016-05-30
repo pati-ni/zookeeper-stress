@@ -8,10 +8,25 @@ echo $CONFFILE
 
 ZK=$SCRIPT_DIR/zookeeper
 
+LOGGER_NODE=node09
+LOGGER_CONF=$HOME/zoo_log.cfg
+LOGGER_DATADIR=/media/localhd/cs091747/zk-logger/data
+LOGGER_DATALOGDIR=/var/tmp/cs091747/zk-logger
+
 
 case $3 in
     start)
-
+        #logger
+        ssh $LOGGER_NODE "bash -c \"\
+                rm -rf $LOGGER_DATADIR ;\
+                rm -rf $LOGGER_DATALOGDIR;\
+                rm -rf /var/tmp/cs091747/zookeeper-logger;\
+                mkdir -p $LOGGER_DATADIR ;\
+                mkdir -p /var/tmp/cs091747/zookeeper-logger;\
+                mkdir -p $LOGGER_DATALOGDIR ;\
+                echo 1 > $LOGGER_DATALOGDIR/myid;\
+		        cp  $LOGGER_CONF /var/tmp/cs091747/zookeeper/;\
+                $ZK start $LOGGER_CONF\""
 	    i=0
         for node in ${nodes[@]}
         do
@@ -29,19 +44,26 @@ case $3 in
 	        ((i++))
         done
 
+
     ;;
     stop)
+            ssh $LOGGER_NODE "bash -c \"\
+		    $ZK $3 $LOGGER_CONF;
+                rm -rf $LOGGER_DATADIR;\
+                rm -rf $LOGGER_DATALOGDIR\""
+
         for node in ${nodes[@]}
         do
             ((i++))
             echo "$node"
             ssh $node "bash -c \"\
-		$ZK $3 $CONFFILE;
+		    $ZK $3 $CONFFILE;
                 rm -rf ${options[dataDir]} ;\
                 rm -rf ${options[dataLogDir]};\
                 rm -rf /var/tmp/cs091747/*;
-                rm -rf /media/localhd/cs091747/*;\""
+                rm -rf /media/localhd/cs091747/*\""
         done
+
     ;;
     reconfig)
         write_config

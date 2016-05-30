@@ -38,7 +38,7 @@ class Monitor(Flask):
 
     def __init__(self, z_node='/logger'):
         logging.basicConfig()
-        self.hosts = client.read_nodes()
+        self.hosts = 'node09:9066'
         self.z_node = z_node
         self.lock = Lock()
         self.df_lock = Lock()
@@ -82,7 +82,6 @@ class Monitor(Flask):
         with self.lock:
             current_requests = self.requests[:]
         df = pd.DataFrame(current_requests, columns=['timestamp', 'response_time', 'id', 'hostname', 'node'])
-        print df
         with self.df_lock:
             throughput = self.plot_throughput(df)
             latency = self.plot_latency(df)

@@ -5,7 +5,6 @@ import time
 from threading import Lock
 from twisted.internet import task
 from kazoo.client import KazooClient
-import copy
 
 
 
@@ -58,7 +57,7 @@ class ClientBase:
 
     finished = False
     counter = {'success':0}
-
+    log_hosts = 'node09:9066'
     def __init__(self, z_node, id, logger_node='/logger', reconnect=True, dynamicReconfig=False,timeout=60):
 
         logging.basicConfig()
@@ -74,6 +73,8 @@ class ClientBase:
         self.lock = Lock()
         self.zk.ensure_path(self.z_node)
         self.zk.ensure_path(self.logger_z_node)
+        self.zk_log = KazooClient(self.log_hosts)
+        self.zk_log.start()
         if self.reconnect:
             self.zk.stop()
 
@@ -91,19 +92,13 @@ class ClientBase:
 
 
     def logger(self):
-
-        zk_log = KazooClient(self.hosts)
-        zk_log.start()
         with self.lock:
             if self.log_queue:
                 log_packet = {'hostname':self.hostname,'node':self.z_node,'type':'client_log','request_data':self.log_queue}
                 message = str(log_packet)
-                zk_log.set(self.logger_z_node, message)
-                log_packet.clear()
+                self.zk_log.set(self.logger_z_node, message)
                 del self.log_queue[:]
 
-        zk_log.stop()
-        del zk_log
 
     def configWatch(self):
         pass
@@ -113,7 +108,7 @@ class ClientBase:
             self.log_queue.append(record)
 
     def __del__(self):
-        self.log.stop()
+        self.zk_log.stop()
         if not self.reconnect:
             self.zk.stop()
         print self.counter['success']

@@ -22,12 +22,18 @@ options["dataLogDir"]=/var/tmp/cs091747/zk
 options["initLimit"]=5
 options["syncLimit"]=2
 options["dynamicConfigFile"]="$CONFFILE.dynamic"
-options["maxClientCnxns"]=0
+#options["maxClientCnxns"]=0
 #options["globalOutstandingLimit"]=50000
 options["forceSync"]=no
+
+options["zookeeper.nio.numSelectorThreads"]=8
+options["zookeeper.nio.numWorkerThreads"]=16
+options["zookeeper.commitProcessor.numWorkerThreads"]=8
+
 options["autopurge.snapRetainCount"]=3
-options["syncEnabled"]=false
-options["leaderServes"]=no
+options["autopurge.purgeInterval"]=2
+#options["syncEnabled"]=false
+#options["leaderServes"]=no
 
 QUORUMPORT1=12888
 QUORUMPORT2=13888
