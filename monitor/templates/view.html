@@ -10,12 +10,12 @@
 </head>
 <body>
 <script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  TeX: {
-     equationNumbers: {  autoNumber: "AMS"  },
-     extensions: ["AMSmath.js", "AMSsymbols.js", "autobold.js"]
-  }
-});
+    MathJax.Hub.Config({
+      TeX: {
+         equationNumbers: {  autoNumber: "AMS"  },
+         extensions: ["AMSmath.js", "AMSsymbols.js", "autobold.js"]
+      }
+    });
 </script>
 <script type="text/javascript" src=
 "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
@@ -25,8 +25,14 @@ MathJax.Hub.Config({
 
 </p>
 <p>
-{{ result[0]|safe }}
-{{ result[1]|safe }}
+{{ throughput[0]|safe }}
+{{ throughput[1]|safe }}
 </p>
+<p>
+{{ latency[0]|safe }}
+{{ latency[1]|safe }}
+</p>
+
+
 </body>
 </html>

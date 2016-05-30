@@ -52,7 +52,6 @@ def complete_task(method):
     def success(self, *args, **kwargs):
         self.counter['success']+=1
         method(self, *args, **kwargs)
-
     return success
 
 class ClientBase:
@@ -60,7 +59,7 @@ class ClientBase:
     finished = False
     counter = {'success':0}
 
-    def __init__(self, z_node, id, logger_node='/logger',reconnect=True):
+    def __init__(self, z_node, id, logger_node='/logger', reconnect=True, dynamicReconfig=False,timeout=60):
 
         logging.basicConfig()
         self.hosts = read_nodes()
@@ -68,8 +67,8 @@ class ClientBase:
         self.hostname = socket.gethostname()
         self.reconnect = reconnect
         self.z_node = z_node
+        self.logger_timeout = timeout
         self.id = id
-
         self.zk = KazooClient(self.hosts)
         self.zk.start()
         self.lock = Lock()
@@ -78,9 +77,17 @@ class ClientBase:
         if self.reconnect:
             self.zk.stop()
 
+        if dynamicReconfig:
+            self.reconfig_lock = Lock()
+            @self.zk.DataWatch('/zookeeper/config')
+            def config_watch(data, stat, event):
+                print 'Data', data
+                print 'Stat', stat
+                print 'Event', event
+
         self.log_queue = []
         self.log = task.LoopingCall(self.logger)
-        self.log.start(5)
+        self.log.start(self.logger_timeout)
 
 
     def logger(self):
@@ -94,11 +101,12 @@ class ClientBase:
                 zk_log.set(self.logger_z_node, message)
                 log_packet.clear()
                 del self.log_queue[:]
-                del message
 
         zk_log.stop()
         del zk_log
 
+    def configWatch(self):
+        pass
 
     def _log_dump(self,record):
         with self.lock:

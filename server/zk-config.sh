@@ -25,12 +25,15 @@ options["dynamicConfigFile"]="$CONFFILE.dynamic"
 options["maxClientCnxns"]=0
 #options["globalOutstandingLimit"]=50000
 options["forceSync"]=no
+options["autopurge.snapRetainCount"]=3
+options["syncEnabled"]=false
+options["leaderServes"]=no
 
 QUORUMPORT1=12888
 QUORUMPORT2=13888
 DYNAMICFILE="$(dirname ${SOURCEFILE})/$(basename ${options["dynamicConfigFile"]})"
 
-OBSERVERS=2
+OBSERVERS=0
 
 nodes=()
 while read -r line;do

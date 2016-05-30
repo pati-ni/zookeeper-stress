@@ -13,7 +13,6 @@ class ClientElection(ClientBase):
         self.counter['success']+=1
         #time.sleep(random.gammavariate(0.7,0.2))
         #print 'Exiting...'
-
     @client.timer
     def leader_election(self):
         self.election = Election(self.zk, self.z_node, identifier = self.hostname)
