@@ -2,9 +2,11 @@ import socket
 import logging
 import timeit
 import time
+import random
 from threading import Lock
 from twisted.internet import task
 from kazoo.client import KazooClient
+from kazoo.recipe.queue import Queue
 
 
 
@@ -31,6 +33,9 @@ def insert_client_nodes(client_file):
 def timer(method):
 
     def timed(self, *args, **kwargs):
+        if hasattr(self, 'wait'):
+            time.sleep(random.range(0,self.wait,0.1))
+
         stamp = time.time()
         if self.reconnect:
             self.zk = KazooClient(self.hosts)
@@ -58,8 +63,7 @@ class ClientBase:
     finished = False
     counter = {'success':0}
     log_hosts = 'node09:9066'
-    def __init__(self, z_node, id, logger_node='/logger', reconnect=True, dynamicReconfig=False,timeout=60):
-
+    def __init__(self, z_node, id, logger_node='/logger', reconnect=False, dynamicReconfig=False, timeout=20):
         logging.basicConfig()
         self.hosts = read_nodes()
         self.logger_z_node = logger_node
@@ -75,6 +79,7 @@ class ClientBase:
         self.zk.ensure_path(self.logger_z_node)
         self.zk_log = KazooClient(self.log_hosts)
         self.zk_log.start()
+        self.queue = Queue(self.zk_log, self.logger_z_node)
         if self.reconnect:
             self.zk.stop()
 
@@ -96,7 +101,7 @@ class ClientBase:
             if self.log_queue:
                 log_packet = {'hostname':self.hostname,'node':self.z_node,'type':'client_log','request_data':self.log_queue}
                 message = str(log_packet)
-                self.zk_log.set(self.logger_z_node, message)
+                self.queue.put(message)
                 del self.log_queue[:]
 
 

@@ -6,6 +6,7 @@ from runner import clientRunner
 class ClientElection(ClientBase):
 
     def __init__(self, z_node, id):
+            #self.wait = 0.6
             ClientBase.__init__(self,z_node, id)
 
     @client.timer

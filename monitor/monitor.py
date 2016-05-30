@@ -1,5 +1,6 @@
 import logging
 from kazoo.client import KazooClient
+from kazoo.recipe.queue import Queue
 from threading import Lock
 from flask import Flask, render_template, request
 import bokeh.plotting as plt
@@ -45,19 +46,25 @@ class Monitor(Flask):
         self.zk = KazooClient(self.hosts)
         self.zk.start()
         self.requests = []
-        self.zk.ensure_path(self.z_node)
+        self.queue = Queue(self.zk,self.z_node)
         Flask.__init__(self,__name__)
 
 
-        @self.zk.DataWatch(self.z_node)
-        def erection_handler(data,stat,event):
-            if not data:
-                return
-            try:
-                request_log = ast.literal_eval(data)
-                self._data_handler(request_log)
-            except ValueError:
-                pass
+        @self.zk.ChildrenWatch(self.z_node)
+        def logger_handler(children):
+            for _ in range(len(self.queue)):
+                data = self.queue.get()
+                if data:
+                    try:
+                        t0 = time.time()
+                        request_log = ast.literal_eval(data)
+                        with self.lock:
+                            self._data_handler(request_log)
+                        print 'Request of size',len(data),' handled in', time.time() - t0, request_log['hostname'], request_log['node']
+                    except ValueError:
+                        print 'ValueError'
+            return True
+
 
         @self.route('/monitor')
         def monitor():
@@ -71,11 +78,9 @@ class Monitor(Flask):
     def _data_handler(self,response):
         if 'request_data' in response:
             client_responses = response['request_data']
-            for i, resp in enumerate(client_responses):
+            for resp in client_responses:
                 extra = (response['hostname'], response['node'])
-                client_responses[i] = resp + extra
-            with self.lock:
-                self.requests = self.requests + client_responses
+                self.requests.append(resp + extra)
 
     def plots(self):
 
@@ -129,4 +134,4 @@ class Monitor(Flask):
 
 if __name__ == '__main__':
     m = Monitor()
-    m.run(host="0.0.0.0", port=20080, debug=True)
+    m.run(host="0.0.0.0", port=20080, debug=False)

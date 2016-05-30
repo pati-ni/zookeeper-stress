@@ -30,8 +30,8 @@ class FeedbackMonitor(Monitor):
         #Monitor.__init__(self, z_node='/logger'+self.monitoring_node,timeout=6)
         self.start(probability_read_bias=0)
         self.start(probability_read_bias=1)
-        for _ in range(2):
-            self.start()
+        for _ in range(1):
+            self.start(probability_read_bias=1)
 
 
     def _improve_throughput(self,data):

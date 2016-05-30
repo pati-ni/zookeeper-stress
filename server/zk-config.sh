@@ -19,16 +19,16 @@ options["tickTime"]=2000
 options["standaloneEnabled"]=false
 options["dataDir"]=/media/localhd/cs091747/zk/data
 options["dataLogDir"]=/var/tmp/cs091747/zk
-options["initLimit"]=5
-options["syncLimit"]=2
+options["initLimit"]=10
+options["syncLimit"]=1
 options["dynamicConfigFile"]="$CONFFILE.dynamic"
 #options["maxClientCnxns"]=0
 #options["globalOutstandingLimit"]=50000
 options["forceSync"]=no
 
-options["zookeeper.nio.numSelectorThreads"]=8
-options["zookeeper.nio.numWorkerThreads"]=16
-options["zookeeper.commitProcessor.numWorkerThreads"]=8
+options["zookeeper.nio.numSelectorThreads"]=12
+options["zookeeper.nio.numWorkerThreads"]=20
+options["zookeeper.commitProcessor.numWorkerThreads"]=12
 
 options["autopurge.snapRetainCount"]=3
 options["autopurge.purgeInterval"]=2
@@ -39,7 +39,7 @@ QUORUMPORT1=12888
 QUORUMPORT2=13888
 DYNAMICFILE="$(dirname ${SOURCEFILE})/$(basename ${options["dynamicConfigFile"]})"
 
-OBSERVERS=0
+OBSERVERS=2
 
 nodes=()
 while read -r line;do
