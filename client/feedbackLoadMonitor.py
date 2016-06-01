@@ -1,6 +1,5 @@
 __author__ = 'main'
 
-from monitor import Monitor
 import pandas as pd
 import numpy as np
 import random
@@ -18,7 +17,7 @@ def nodes_throughput(df):
     groups = df.groupby('id')['timestamp'].aggregate(lambda x : x.count()/float(x.max()-x.min()))
     return groups.mean()
 
-class FeedbackMonitor(Monitor):
+class FeedbackMonitor:
     clients_spawned = 0
     def __init__(self, node, client_nodes='node_list'):
         self.client = {'read':"leaderElection.py", 'write':"leaderElectionWrite.py"}
@@ -27,9 +26,8 @@ class FeedbackMonitor(Monitor):
         self.monitoring_node = node
         self.seed = random.choice(range(len(self.nodes)))
         self.client_lock = Lock()
-        #Monitor.__init__(self, z_node='/logger'+self.monitoring_node,timeout=6)
-        self.start(probability_read_bias=0)
-        self.start(probability_read_bias=1)
+        #self.start(probability_read_bias=0)
+        #self.start(probability_read_bias=1)
         for _ in range(1):
             self.start(probability_read_bias=1)
 

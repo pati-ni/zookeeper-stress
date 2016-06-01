@@ -1,13 +1,13 @@
 from kazoo.recipe.election import Election
-from client import ClientBase
+from client import ZkBase
 import client
 from runner import clientRunner
 
-class ClientElection(ClientBase):
+class ClientElection(ZkBase):
 
     def __init__(self, z_node, id):
             #self.wait = 0.6
-            ClientBase.__init__(self,z_node, id)
+            ZkBase.__init__(self,z_node, id)
 
     @client.timer
     def leader_election(self):

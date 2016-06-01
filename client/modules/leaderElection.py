@@ -1,21 +1,21 @@
 from kazoo.recipe.election import Election
-from client import ClientBase
+from client import ZkBase
 import client
 from runner import clientRunner
 
-class ClientElection(ClientBase):
+class ClientElection(ZkBase):
 
     def __init__(self, z_node, id):
-        ClientBase.__init__(self, z_node, id)
+        ZkBase.__init__(self, z_node, id)
+        self.election = Election(self.zk, self.z_node, identifier=self.hostname)
 
     @client.complete_task
     def election_won(self,hostname):
-        self.counter['success']+=1
+        pass
         #time.sleep(random.gammavariate(0.7,0.2))
         #print 'Exiting...'
     @client.timer
     def leader_election(self):
-        self.election = Election(self.zk, self.z_node, identifier = self.hostname)
         self.election.run(self.election_won,self.hostname)
 
 

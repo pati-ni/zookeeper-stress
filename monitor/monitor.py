@@ -1,14 +1,13 @@
 import logging
 from kazoo.client import KazooClient
 from kazoo.recipe.queue import Queue
+
 from threading import Lock
-from flask import Flask, render_template, request
+from flask import Flask, render_template
 import bokeh.plotting as plt
 import numpy as np
 import pandas as pd
-import client
 import ast
-import model
 import time
 
 
@@ -46,13 +45,16 @@ class Monitor(Flask):
         self.zk = KazooClient(self.hosts)
         self.zk.start()
         self.requests = []
+        self.zk.ensure_path(self.z_node)
         self.queue = Queue(self.zk,self.z_node)
         Flask.__init__(self,__name__)
 
 
         @self.zk.ChildrenWatch(self.z_node)
         def logger_handler(children):
-            for _ in range(len(self.queue)):
+            l = len(self.queue)
+            print l
+            for _ in range(l):
                 data = self.queue.get()
                 if data:
                     try:
@@ -118,8 +120,8 @@ class Monitor(Flask):
         t = np.linspace(0,bins_count,num=bins_count, endpoint=False)
         latency = df['response_time'].groupby(bins).mean()*1000
         p = plot_line(t, latency.values,
-                      legend="Requests per second",
-                      title="Throughput",
+                      legend="160",
+                      title="Latency",
                       x_axis="Seconds",
                       y_axis="Requests",
                       width=1600,
