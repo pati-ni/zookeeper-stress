@@ -1,7 +1,7 @@
 from kazoo.recipe.election import Election
-from client import ZkBase
-import client
-from runner import clientRunner
+from zookeeper.client import ZkBase
+import zookeeper.client
+from zookeeper.runner import clientRunner
 
 class ClientElection(ZkBase):
 

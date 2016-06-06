@@ -1,7 +1,7 @@
 from kazoo.recipe.election import Election
 from client import ZkBase
-import client
-from runner import clientRunner
+import zookeeper.client
+from zookeeper.runner import clientRunner
 
 class ClientElection(ZkBase):
 
@@ -18,7 +18,7 @@ class ClientElection(ZkBase):
     @client.complete_task
     def election_won(self,hostname):
         #print 'Success',hostname,'Synthetic workload running...'
-        self.counter['success']+=1
+        #self.counter['success']+=1
         self.zk.set(self.z_node,str(self.counter['success']))
         #print 'Exiting...'
 

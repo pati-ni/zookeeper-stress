@@ -1,0 +1,53 @@
+#!/bin/bash
+source "$HOME/zookeeper/client/scripts/env.sh"
+nodes=("node09" "node15" "node14" "node10" "node11" "node12" "node13")
+
+ARGS_NUM=1
+CLIENT_NAME="kz-leaderElection.py"
+
+if [[ $# -lt $ARGS_NUM ]]
+then
+    echo "$# $ARGS_NUM"
+    echo "Usage: $0 <command> <optional-args>"
+    exit 1
+fi
+
+function client_start {
+    if [[ $1 -eq "0" ]]
+    then
+	return
+    fi
+    local i=0
+    for node in $(seq 1 $1);do
+	((i++))
+	#echo "Starting client in $client"
+	#echo "$SCRIPTS_DIR/start-client.sh $CLIENT_NAME"
+	ssh $2 "bash -c \"screen -dmS zk-client-$i $SCRIPTS_DIR/start-client.sh $CLIENT_NAME\" "
+    done
+    echo "ended batch of $1 clients on $2"
+}
+
+
+case $1 in
+    start)
+	clients=$(( $2 / ${#nodes[@]}  ))
+	for node in  ${nodes[@]};do
+	    ( client_start $clients $node ) &
+	done
+	for i in $(seq 1 $(( $2 % ${#nodes[@]} )))
+	do
+	    node=${nodes[$i % ${#nodes[@]} ]}
+	    ( client_start 1 $node ) &
+	done
+	;;
+    stop)
+	echo "Stopping clients in active nodes"
+	for node in ${nodes[@]};do
+	    ssh $node  "$SCRIPTS_DIR/stop-client.sh $CLIENT_NAME" 
+	done
+	killall ssh &> /dev/null
+ma	;;
+    *)
+	echo "Unknown command $1"
+
+esac

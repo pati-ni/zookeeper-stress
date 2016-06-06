@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import random
 import subprocess
-import client
+import zookeeper.client
 import sys
 from flask import Flask
 from threading import Lock
