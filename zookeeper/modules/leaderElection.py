@@ -1,6 +1,6 @@
 from kazoo.recipe.election import Election
 from zookeeper.client import ZkBase
-import zookeeper.client
+import zookeeper.client as client
 from zookeeper.runner import clientRunner
 
 class ClientElection(ZkBase):

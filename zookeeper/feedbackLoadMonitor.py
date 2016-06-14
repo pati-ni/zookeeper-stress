@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import random
 import subprocess
-import zookeeper.client
+import zookeeper.client as client
 import sys
 from flask import Flask
 from threading import Lock
@@ -60,7 +60,7 @@ class FeedbackMonitor:
     def start(self, probability_read_bias=0.9):
 
         project_dir = "/home/students/cs091747/zookeeper"
-        script_dir = "client/scripts"
+        script_dir = "zookeeper/scripts"
         print self.nodes
         if random.random()< probability_read_bias:
             client_file = self.client['read']

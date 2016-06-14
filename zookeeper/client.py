@@ -7,7 +7,7 @@ from threading import Lock, Timer
 from kazoo.client import KazooClient
 from kazoo.recipe.queue import Queue
 
-logger_interval = 150
+logger_timeout = 10
 
 def read_nodes(file='/home/students/cs091747/zookeeper/server/nodes_list',port=9666):
     nodes=[]
@@ -56,13 +56,19 @@ class ClientBase:
     counter = {'success':0}
     log_hosts = 'node09:9066'
     lock = Lock()
-    logger_timeout = logger_interval
 
-    def __init__(self, id, logger_node='/logger'):
+    def __init__(self, id, logger_node='/logger', logger_interval=None):
         logging.basicConfig()
         self.logger_z_node = logger_node
         self.hostname = socket.gethostname()
         self.id = id
+
+        self.z_node = '/default'
+
+        if logger_interval is None:
+            self.logger_timeout = logger_timeout
+        else:
+            self.logger_timeout = logger_interval
 
         self.zk_log = KazooClient(self.log_hosts)
         self.zk_log.start()
@@ -90,7 +96,7 @@ class ClientBase:
 
     def __del__(self):
         self.zk_log.stop()
-        self.disconnect()
+
         print 'Lock Acquired', self.counter['success'], 'times'
 
 
@@ -126,4 +132,7 @@ class ZkBase(ClientBase):
 
     def disconnect(self):
         self.zk.stop()
+
+    def __del__(self):
+        self.disconnect()
 

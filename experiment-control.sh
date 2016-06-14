@@ -10,10 +10,10 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 NODESLIST="$SCRIPT_DIR/server/nodes_list"
 
 function stop_clients {
-    for client in $(ls $SCRIPT_DIR/client/modules/*.py);
+    for client in $(ls $SCRIPT_DIR/zookeeper/modules/*.py);
     do
         echo "killing client $client"
-        ./client/scripts/clients.sh stop $(basename $client)
+        ./zookeeper/scripts/clients.sh stop $(basename $client)
     done
 
 }
